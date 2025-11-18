@@ -1,0 +1,550 @@
+     <!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>SS Tamilan — Portfolio</title>
+
+  <!-- Font Awesome used in your original -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* ---------- VARIABLES & RESET ---------- */
+    :root{
+      --bg: #071024;
+      --card: rgba(11,18,32,0.8);
+      --accent: #6ee7b7;
+      --muted: #94a3b8;
+      --glass: rgba(255,255,255,0.03);
+      --text: #e6eef8;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html { scroll-behavior: smooth; font-family: Inter, system-ui, Arial, sans-serif; }
+    body {
+      min-height:100vh;
+      color:var(--text);
+      background: linear-gradient(180deg, #020617 0%, #071024 65%);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.45;
+    }
+
+    /* ---------- LAYOUT ---------- */
+    .nav {
+      position: fixed;
+      left: 18px;
+      top: 18px;
+      z-index: 120;
+    }
+    .brand {
+      font-weight:700;
+      padding:8px 12px;
+      border-radius:10px;
+      background:linear-gradient(90deg,var(--accent),#34d399);
+      color:#042027;
+      margin-bottom:10px;
+      display:inline-block;
+    }
+    
+    
+    .nav-links{ list-style:none; padding:10px; background:var(--card); border-radius:12px; backdrop-filter:blur(6px);
+      display:flex; flex-direction:column; gap:8px; width:120       px;
+    }
+    .nav-links a{
+      color:var(--muted); text-decoration:none; padding:8px; border-radius:8px; display:block; transition:all .18s ease;
+      font-size:14px;
+    }
+    .nav-links a:hover, .nav-links a.active { color:var(--accent); transform:translateX(6px); }
+
+    main{ max-width:1200px; margin:40px auto; padding:20px; display:flex; flex-direction:column; gap:80px; }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:14px; padding:120px; box-shadow: 0 6px 30px rgba(8, 21, 75, 0.45);
+      backdrop-filter: blur(8px); border:1px solid rgba(255,255,255,0.02);
+      gap: 40px;
+        
+    }
+
+    h1,h2,h3{ margin-bottom:12px; color:var(--text) }
+    .muted { color:var(--muted); font-size:0.95rem }
+
+    /* ---------- ABOUT ---------- */
+    .about-wrap { display:flex; gap:22px; align-items:center; flex-wrap:wrap; }
+    .profile {
+      width:250px; height:300px; border-radius:5%; object-fit:cover; padding:4px;  
+      box-shadow:0 6px 30px #34d399;
+    }
+    @keyframes glowBorder { 0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%} }
+
+    .tags { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap }
+    .tags span { background: rgba(255,255,255,0.02); padding:6px 10px; border-radius:999px; font-size:13px }
+
+    /* ---------- SKILLS ---------- */
+    .skills-grid{ display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:14px; }
+    .skill-block{ padding:14px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.015), transparent);
+      border-left:4px solid rgba(255,255,255,0.02); transition: transform .22s, box-shadow .22s;
+    }
+    .skill-block:hover{ transform: translateY(-6px); box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+
+    /* ---------- PROJECTS & CERTS ---------- */
+    .projects-wrap { display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap; }
+    .projects-grid, .certs-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap:12px; width:100%; }
+    .project, .cert { border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,0.02); cursor:pointer; position:relative; background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent); transition: transform .18s, box-shadow .18s;}
+    .project:hover, .cert:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(2,6,23,0.6); }
+
+    .project img, .cert img { width:100%; height:120px; object-fit:cover; display:block; }
+    .proj-title, .cert-title { padding:10px; font-weight:600; font-size:0.95rem; color:var(--text); background:transparent; }
+
+    /* Hover overlay (title button) */
+    .hover-overlay {
+      position:absolute; inset:0; display:flex; align-items:flex-end; justify-content:center; pointer-events:none;
+      background: linear-gradient(180deg, transparent 45%, rgba(0,0,0,0.45) 100%); opacity:0; transition:opacity .18s;
+    }
+    .project:hover .hover-overlay, .cert:hover .hover-overlay { opacity:1; }
+    .hover-label {
+      pointer-events:auto; margin:12px; padding:8px 12px; border-radius:999px; background:rgba(0,0,0,0.6);
+      color:var(--text); font-weight:700; font-size:0.9rem; border:1px solid rgba(255,255,255,0.03);
+    }
+
+    /* preview box (right of projects on wide screens) */
+    .preview { min-width:220px; padding:12px; border-radius:10px; background: linear-gradient(90deg, rgba(110,231,183,0.03), transparent); font-style:italic; transition: transform .2s; }
+    .preview:hover { transform: translateY(-4px); }
+
+    /* ---------- TOOLTIP ---------- */
+    .cursor-tooltip {
+      position:fixed; pointer-events:none; padding:8px 10px; font-size:13px; border-radius:8px; white-space:nowrap;
+      transform: translate(-50%, -150%); opacity:0; transition: opacity .12s, transform .12s; z-index:999;
+      background: rgba(0,0,0,0.72); color:var(--text); border:1px solid rgba(255,255,255,0.03);
+    }
+
+    /* ---------- MODALS ---------- */
+    .modal {
+      display:none; position:fixed; z-index:1100; left:0; top:0; width:100%; height:100%; background: rgba(0,0,0,0.85);
+      justify-content:center; align-items:center; padding:24px;
+    }
+    .modal.show { display:flex; }
+    .modal-content {
+      max-width: 95%; max-height: 90%; border-radius:12px; box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+    }
+    .modal-img { width:auto; max-width:100%; max-height:80vh; height:auto; display:block; border-radius:8px; }
+    .modal-top-close {
+      position:absolute; top:18px; right:20px; color:#fff; font-size:28px; cursor:pointer; z-index:1201;
+      background: rgba(0,0,0,0.2); padding:6px 10px; border-radius:8px;
+    }
+    .modal-caption { color:var(--muted); margin-top:12px; text-align:center; font-size:1rem; }
+
+    /* resume iframe */
+    .resume-frame { width:80vw; height:80vh; border:none; background:#fff; border-radius:8px; }
+
+    /* ---------- FOOTER & SOCIALS ---------- */
+    .socials { display:flex; justify-content:center; gap:12px; margin-top:14px; flex-wrap:wrap; }
+    .soc { padding:8px 10px; border-radius:8px; background:var(--glass); text-decoration:none; color:inherit; display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; }
+    .soc:hover { transform:scale(1.05); color:var(--accent); }
+
+    footer.footer { text-align:center; padding:18px; color:var(--muted); margin-top:20px; font-size:0.95rem; }
+
+    /* ---------- FADE IN ON SCROLL ---------- */
+    section { opacity:0; transform: translateY(10px); transition: opacity .6s ease, transform .6s ease; }
+    section.visible { opacity:1; transform: none; }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width:900px){
+      .nav { position: static; margin:12px auto; display:flex; justify-content:center; }
+      .nav-links { flex-direction:row; overflow:auto; width:auto; gap:12px; padding:8px 10px; }
+      main { margin-top:6px; padding:12px; }
+      .about-wrap { flex-direction:column; align-items:flex-start; }
+      .profile { width:120px; height:120px; }
+      .preview { order:3; width:100% }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- custom tooltip that follows cursor -->
+  <div id="cursorTooltip" class="cursor-tooltip" aria-hidden="true"></div>
+
+  <nav class="nav">
+    <div class="brand">SS TAMILAN</div>
+    <ul class="nav-links" role="navigation">
+      <li><a href="#about">About</a></li>
+      <li><a href="#education">Education</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#certificates">Certificates</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#resume" id="resumeOpenLink">Resume</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <!-- ABOUT -->
+    <section id="about" class="card">
+      <div class="about-wrap">
+        <img src="images/profile.jpg" alt="Profile" class="profile" id="profileImg">
+        <div>
+          <h1>S.Suriyabalaji</h1>
+          <p class="muted">Software Engineer • Frontend & Backend Developer • Karate Instructor (Shodan)</p>
+          <p>I craft elegant user interfaces and resilient backends — and teach martial arts with discipline and patience.</p>
+          <div class="tags">
+            <span>Full-stack</span><span>React</span><span>Node.js</span><span>Karate</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDUCATION -->
+    <section id="education" class="card">
+      <h2>Education</h2>
+      <div class="list">
+        <div class="item"><strong>B.tech — Computer Science & Business System</strong><div class="muted">Mohamed Sathak A.J. College Of Engineering, 2022–2026 • CGPA 7.7</div></div>
+        <div class="item"><strong>Higher Secondary</strong><div class="muted">Avichi Hr Sec School, 2020–2022</div></div>
+        <div class="item"><strong>Secondary</strong><div class="muted">Bharathi Hr Sec Matriculation School, 2019–2020</div></div>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills" class="card">
+      <h2>Skills</h2>
+      <div class="skills-grid">
+        <div class="skill-block">
+          <h3>Languages</h3>
+          <div class="chips"><span>Java</span><span>Python</span><span>Dart</span></div>
+        </div>
+        <div class="skill-block">
+          <h3>Frontend</h3>
+          <div class="chips"><span>HTML</span><span>CSS</span><span>JavaScript</span><span>React</span></div>
+        </div>
+        <div class="skill-block">
+          <h3>Backend</h3>
+          <div class="chips"><span>Node.js</span><span>Express</span><span>MySQL</span></div>
+        </div>
+        <div class="skill-block">
+          <h3>Tools</h3>
+          <div class="chips"><span>Git</span><span>Github</span><span>Colab</span><span>Flutter</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects" class="card">
+      <h2>Projects</h2>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;">
+        <div class="projects-grid" id="projectsGrid">
+          <div class="project" tabindex="0" data-desc="Library Management System — React + Node + MySQL">
+            <img src="images/project1.jpg" alt="Library Management">
+            <div class="hover-overlay"><div class="hover-label">Library Management</div></div>
+            <div class="proj-title">Library Management</div>
+          </div>
+          <div class="project" tabindex="0" data-desc="Personal responsive portfolio website">
+            <img src="images/project2.jpg" alt="Portfolio Website">
+            <div class="hover-overlay"><div class="hover-label">Portfolio Website</div></div>
+            <div class="proj-title">Portfolio Website</div>
+          </div>
+          <div class="project" tabindex="0" data-desc="Bus Tracking & Need Request App — mobile app for public Transportation">
+            <img src="images/project3.jpg" alt="TN Bus Transport">
+            <div class="hover-overlay"><div class="hover-label">TN Bus Transport Management</div></div>
+            <div class="proj-title">TN Bus Transport Management</div>
+          </div>
+          <div class="project" tabindex="0" data-desc="Karate Attendance App — mobile app for dojo management">
+            <img src="images/project4.jpg" alt="Karate Attendance">
+            <div class="hover-overlay"><div class="hover-label">Karate Attendance</div></div>
+            <div class="proj-title">Karate Attendance</div>
+          </div>
+        </div>
+
+        <div class="preview" id="project-preview">Hover a project to see details here.</div>
+      </div>
+    </section>
+
+    <!-- CERTIFICATES -->
+    <section id="certificates" class="card">
+      <h2>Certificates</h2>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;">
+        <div class="certs-grid" id="certsGrid">
+          <div class="cert" tabindex="0" data-desc="IIT Shaastra AIML Challenge — Winner">
+            <img src="images/cert1.png" alt="IIT Shaastra">
+            <div class="hover-overlay"><div class="hover-label">IIT Madras Shaastra Techathon 2024</div></div>
+            <div class="cert-title">IIT Madras Shaastra Techathon 2024</div>
+          </div>
+          <div class="cert" tabindex="0" data-desc="Artificial Intelligence — EduBridge">
+            <img src="images/cert2.png" alt="AI EduBridge">
+            <div class="hover-overlay"><div class="hover-label">Artificial Intelligence</div></div>
+            <div class="cert-title">Artificial Intelligence</div>
+          </div>
+          <div class="cert" tabindex="0" data-desc="Business Intelligence — IBM Career Education">
+            <img src="images/cert3.png" alt="Business Intelligence">
+            <div class="hover-overlay"><div class="hover-label">Business Intelligence</div></div>
+            <div class="cert-title">Business Intelligence</div>
+          </div>
+          <div class="cert" tabindex="0" data-desc="JavaScript — Spoken Tutorial by IIT Bombay">
+            <img src="images/cert4.png" alt="JavaScript">
+            <div class="hover-overlay"><div class="hover-label">JavaScript</div></div>
+            <div class="cert-title">JavaScript</div>
+          </div>
+          <div class="cert" tabindex="0" data-desc="Python — Spoken Tutorial by IIT Bombay">
+            <img src="images/cert5.png" alt="Python">
+            <div class="hover-overlay"><div class="hover-label">Python</div></div>
+            <div class="cert-title">Python</div>
+          </div>
+          <div class="cert" tabindex="0" data-desc="BootStrap Training — Spoken Tutorial by IIT Bombay">
+            <img src="images/cert6.png" alt="Python">
+            <div class="hover-overlay"><div class="hover-label">BootStrap</div></div>
+            <div class="cert-title">BootStrap</div>
+          </div>
+          <div class="cert" tabindex="0" data-desc="Blockchain Foundation — Kerala BlockChain Academy">
+            <img src="images/cert7.png" alt="Blockchain Foundation">
+            <div class="hover-overlay"><div class="hover-label">Blockchain Foundation</div></div>
+            <div class="cert-title">Blockchain Foundation</div>
+          </div>
+          <div class="cert" tabindex="0" data-desc="Php and MySql — Spoken Tutorial by IIT Bombay">
+            <img src="images/cert8.png" alt="Php and MySql">
+            <div class="hover-overlay"><div class="hover-label">Php and MySql</div></div>
+            <div class="cert-title">Php and MySql</div>
+          </div>
+          
+        </div>
+
+        <div class="preview" id="cert-preview">Hover a certificate to see details here.</div>
+      </div>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section id="experience" class="card">
+      <h2>Experience</h2>
+      <div class="list">
+        <div class="item"><strong>Software Developer Intern</strong><div class="muted">Semantic Soft Solutions — Jan 2025–Feb 2025</div></div>
+        <div class="item"><strong>Karate Instructor</strong><div class="muted">Goshin Ryu Karate Dojo — 2023–Present</div></div>
+      </div>
+    </section>
+
+    <!-- RESUME (link opens modal) -->
+    <section id="resume" class="card">
+      <h2>Resume</h2>
+      <a class="btn" id="openResumeBtn" href="#" style="display:inline-block;padding:10px 14px;border-radius:8px;background:linear-gradient(90deg,var(--accent),#34d399);color:#042027;text-decoration:none;font-weight:700">Open / View Resume</a>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="card">
+      <h2>Contact</h2>
+      
+
+
+      <div class="socials" style="margin-top:18px">
+        <a class="soc phone" href="tel:+919962434596"><i class="fas fa-phone"></i></a>
+        <a class="soc mail" href="mailto:suriyabalaji373@gmail.com"><i class="fas fa-envelope"></i></a>
+        <a class="soc wa" href="https://wa.me/9962434596" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        <a class="soc in" href="https://linkedin.com/in/s-suriyabalaji" target="_blank"><i class="fab fa-linkedin"></i></a>
+        <a class="soc ig" href="https://instagram.com/sensei_suriyabalaji" target="_blank"><i class="fab fa-instagram"></i></a>
+      </div>
+
+      <footer class="footer">© <span id="year"></span> SS Tamilan — IT & Karate</footer>
+    </section>
+  </main>
+
+  <!-- Certificate Modal -->
+  <div id="certModal" class="modal" aria-hidden="true" role="dialog" aria-label="Certificate viewer">
+    <div class="modal-top-close" id="certModalClose" title="Close certificate">&times;</div>
+    <div style="text-align:center">
+      <img id="certModalImg" class="modal-img modal-content" alt="Certificate image">
+      <div id="certModalCaption" class="modal-caption"></div>
+    </div>
+  </div>
+
+  <!-- Resume Modal -->
+  <div id="resumeModal" class="modal" aria-hidden="true" role="dialog" aria-label="Resume viewer">
+    <div class="modal-top-close" id="resumeModalClose" title="Close resume">&times;</div>
+    <iframe id="resumeIframe" class="resume-frame" src="resume.pdf"></iframe>
+  </div>
+
+  <script>
+    // ---------- basic DOM ready ----------
+    document.addEventListener('DOMContentLoaded', () => {
+      // set year
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // NAV HIGHLIGHT using IntersectionObserver
+      const sections = Array.from(document.querySelectorAll('main section'));
+      const navLinks = Array.from(document.querySelectorAll('.nav-links a'));
+
+      const navObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          const id = entry.target.id;
+          const link = document.querySelector(`.nav-links a[href="#${id}"]`);
+          if (entry.isIntersecting) {
+            navLinks.forEach(l => l.classList.remove('active'));
+            if (link) link.classList.add('active');
+          }
+        });
+      }, { threshold: 0.6 });
+
+      sections.forEach(s => navObserver.observe(s));
+
+      // FADE IN ON SCROLL (same observer or separate)
+      const fadeObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+      }, { threshold: 0.22 });
+      sections.forEach(s => fadeObserver.observe(s));
+
+      // SMOOTH SCROLL for nav links (already CSS smooth, this ensures block align)
+      document.querySelectorAll('.nav-links a').forEach(a => {
+        a.addEventListener('click', (e) => {
+          // allow resume link to open modal instead
+          if (a.id === 'resumeOpenLink') {
+            e.preventDefault();
+            openResumeModal();
+            return;
+          }
+          e.preventDefault();
+          const target = document.querySelector(a.getAttribute('href'));
+          if (target) target.scrollIntoView({ behavior:'smooth', block:'start' });
+        });
+      });
+
+      // PROJECT PREVIEW + TOOLTIP
+      const projects = Array.from(document.querySelectorAll('.project'));
+      const projectsPreview = document.getElementById('project-preview');
+      const certs = Array.from(document.querySelectorAll('.cert'));
+      const certPreview = document.getElementById('cert-preview');
+
+      // cursor tooltip element
+      const cursorTooltip = document.getElementById('cursorTooltip');
+
+      function attachPreviewListeners(items, previewEl) {
+        items.forEach(item => {
+          const desc = item.dataset.desc || item.querySelector('.proj-title')?.textContent || 'No details';
+          item.addEventListener('mouseenter', () => {
+            if (previewEl) previewEl.textContent = desc;
+            // set tooltip visible
+            cursorTooltip.style.opacity = 1;
+            cursorTooltip.textContent = desc;
+          });
+          item.addEventListener('mouseleave', () => {
+            if (previewEl) previewEl.textContent = (previewEl === projectsPreview ? 'Hover a project to see details here.' : 'Hover a certificate to see details here.');
+            cursorTooltip.style.opacity = 0;
+          });
+          item.addEventListener('mousemove', (e) => {
+            // update tooltip position
+            cursorTooltip.style.left = (e.clientX + 18) + 'px';
+            cursorTooltip.style.top = (e.clientY + 18) + 'px';
+          });
+
+          // click to open certificate modal for certs OR custom action for projects
+          if (item.classList.contains('cert')) {
+            item.addEventListener('click', () => openCertModal(item));
+            // keyboard accessibility
+            item.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openCertModal(item); }});
+          } else {
+            // projects: you may link to live/demo or expand - for now show same modal behavior (image open) if image exists
+            const img = item.querySelector('img');
+            if (img) {
+              img.addEventListener('click', () => {
+                // reuse cert modal to show project image and desc
+                openCertModal(item, true);
+              });
+            }
+            item.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); const img = item.querySelector('img'); if (img) openCertModal(item, true); }});
+          }
+        });
+      }
+
+      attachPreviewListeners(projects, projectsPreview);
+      attachPreviewListeners(certs, certPreview);
+
+      // ---------- CERT MODAL ----------
+      const certModal = document.getElementById('certModal');
+      const certModalImg = document.getElementById('certModalImg');
+      const certModalCaption = document.getElementById('certModalCaption');
+      const certModalClose = document.getElementById('certModalClose');
+
+      function openCertModal(el, isProject=false) {
+        const img = el.querySelector('img');
+        if (!img) return;
+        certModalImg.src = img.src;
+        certModalCaption.textContent = el.dataset.desc || el.querySelector('.proj-title')?.textContent || '';
+        certModal.classList.add('show');
+        certModal.setAttribute('aria-hidden','false');
+        // trap focus to close button for accessibility (simple)
+        certModalClose.focus();
+      }
+
+      function closeCertModal() {
+        certModal.classList.remove('show');
+        certModal.setAttribute('aria-hidden','true');
+        certModalImg.src = '';
+      }
+
+      certModalClose.addEventListener('click', closeCertModal);
+      certModal.addEventListener('click', (e) => { if (e.target === certModal) closeCertModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeCertModal(); closeResumeModal(); }});
+
+      // ---------- RESUME MODAL ----------
+      const resumeModal = document.getElementById('resumeModal');
+      const resumeModalClose = document.getElementById('resumeModalClose');
+      const openResumeBtn = document.getElementById('openResumeBtn');
+
+      function openResumeModal() {
+        resumeModal.classList.add('show');
+        resumeModal.setAttribute('aria-hidden','false');
+        resumeModalClose.focus();
+      }
+      function closeResumeModal() {
+        resumeModal.classList.remove('show');
+        resumeModal.setAttribute('aria-hidden','true');
+      }
+      resumeModalClose.addEventListener('click', closeResumeModal);
+      resumeModal.addEventListener('click', (e) => { if (e.target === resumeModal) closeResumeModal(); });
+      if (openResumeBtn) openResumeBtn.addEventListener('click', (e) => { e.preventDefault(); openResumeModal(); });
+
+      // ---------- CONTACT FORM SUBMIT (AJAX to backend) ----------
+      
+      const scriptURL = "https://script.google.com/macros/s/AKfycbzl8pmZ51pQbUGjwEUyHiv1qr_CG0h9BYIqAkTCn2Pk2gIpM3pRisLZ4KwZ3njh9WY8Ag/exec";
+
+document.getElementById("contactForm").addEventListener("submit", e => {
+    e.preventDefault();
+
+    let data = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        message: document.getElementById("message").value
+    };
+
+    fetch(scriptURL, {
+        method: "POST",
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(() => {
+        document.getElementById("status").innerText = "Message Sent Successfully!";
+        document.getElementById("contactForm").reset();
+    })
+    .catch(err => {
+        document.getElementById("status").innerText = "Error sending message.";
+    });
+});
+
+      
+
+      // prevent heavy selection on drag for images
+      document.querySelectorAll('img').forEach(img => img.setAttribute('draggable', 'false'));
+    });
+
+    // ---------- small helper: openCertModal and resume close exported to window for inline onclick fallback ----------
+    window.openCertModal = function(el) {
+      // if given element or selector
+      if (typeof el === 'string') el = document.querySelector(el);
+      if (el) { document.querySelectorAll('.cert').forEach(c=>c.blur()); el.click(); }
+    };
+
+    // ---------- ensure tab focus outlines are visible for accessibility ---------- 
+    document.addEventListener('keyup', (e) => { if (e.key === 'Tab') document.body.classList.add('show-focus'); });
+
+    // Hide tooltip initially (CSS transitions handle fade)
+    document.getElementById('cursorTooltip').style.opacity = 0;
+    
+  </script>
+</body>
+</html>
